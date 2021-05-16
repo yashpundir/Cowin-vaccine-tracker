@@ -17,8 +17,8 @@ def function(code):
     date = f"{today.day}-{today.month}-{today.year}"
 
     # Twilio Authentication
-    account_sid = os.environ['twilio_sid'] 
-    auth_token = os.environ['twilio_auth_token'] 
+    account_sid = 'AC0ba54eea661ee74cc85eb73994803ace'   #os.environ['twilio_sid'] 
+    auth_token = '896a4d70d7b8d136f009dde0cd5b6d5c' #os.environ['twilio_auth_token'] 
     client = Client(account_sid, auth_token)
 
     url = f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={code['place'][0]}&date={date}"
@@ -55,7 +55,6 @@ def function(code):
 
     
     
-
 schedule.every(6).hours.do(function, code=pkl_code)
 schedule.every(6).hours.do(function, code=chd_code)
 while True:
