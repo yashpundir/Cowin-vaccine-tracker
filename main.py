@@ -4,14 +4,14 @@ import requests
 import schedule
 from twilio.rest import Client
 
-# ambala_code = 193
-# chd_code = 108
-# meerut = 676
-pkl_code = 187
 
+pkl_code = {'place':[187,'pkl']}
+chd_code = {'place':[108,'chd']}
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
+proxies = {'https':'http://13.235.248.19:3128'}
 
-def function():
+
+def function(code):
     result = []
     today = datetime.datetime.today()
     date = f"{today.day}-{today.month}-{today.year}"
@@ -21,8 +21,8 @@ def function():
     auth_token = os.environ['twilio_auth_token'] 
     client = Client(account_sid, auth_token)
 
-    url = f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={pkl_code}&date={date}"
-    res = requests.get(url, headers=headers)
+    url = f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={code['place'][0]}&date={date}"
+    res = requests.get(url, headers=headers, proxies=proxies)
 
     if res.ok:
         res_json = res.json()
@@ -41,21 +41,22 @@ def function():
             if flag:
                 result.append(place)
 
+        if len(result)==0:
+            result = f"no slots available in {code['place'][1]}"
+
     else:
         result = 'error in res'
 
 
-    if len(result)>0:
-        message = client.messages.create(from_='whatsapp:+14155238886',  
+    
+    message = client.messages.create(from_='whatsapp:+14155238886',  
                                         body=f"Your cowin code is \n{result}",      
                                         to='whatsapp:+917000263689')
 
-    else:
-        message = client.messages.create(from_='whatsapp:+14155238886',  
-                                        body=f"Your cowin code is \nno slots available",      
-                                        to='whatsapp:+917000263689')
+    
     
 
-schedule.every(6).hours.do(function)
+schedule.every(6).hours.do(function, code=pkl_code)
+schedule.every(6).hours.do(function, code=chd_code)
 while True:
     schedule.run_pending()
