@@ -8,23 +8,46 @@ from twilio.rest import Client
 pkl_code = {'place':[187,'pkl']}
 chd_code = {'place':[108,'chd']}
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
-proxies = {'https':'http://13.235.248.19:3128'}
+
+with open('D:/Yash/Python Projects/Cowin vaccine tracker/proxies.txt','r') as file:
+    data = file.readlines()
+
+proxies = {'https': data[0][9:-2].split(','),
+            'SOCKS4': data[1][10:-1].split(',')}
 
 
 def function(code):
+
     result = []
     today = datetime.datetime.today()
     date = f"{today.day}-{today.month}-{today.year}"
 
     # Twilio Authentication
-    account_sid = 'AC0ba54eea661ee74cc85eb73994803ace'   #os.environ['twilio_sid'] 
-    auth_token = '896a4d70d7b8d136f009dde0cd5b6d5c' #os.environ['twilio_auth_token'] 
+    account_sid = os.environ['twilio_sid'] 
+    auth_token = os.environ['twilio_auth_token'] 
     client = Client(account_sid, auth_token)
 
     url = f"https://cdn-api.co-vin.in/api/v2/appointment/sessions/public/calendarByDistrict?district_id={code['place'][0]}&date={date}"
-    res = requests.get(url, headers=headers, proxies=proxies)
+    
+    got_through = False
+    for key in proxies:
+        for ip in proxies[key]:
+            try:
+                res = requests.get(url, headers=headers, proxies={key:ip}, timeout=5)
+                if res.ok:
+                    got_through = True
+                    break
+            except:
+                continue
+        
+        if got_through==True:
+            break
+        
+        else:
+            continue
+    
 
-    if res.ok:
+    if got_through:
         res_json = res.json()
 
         for center in res_json['centers']:
@@ -42,19 +65,19 @@ def function(code):
                 result.append(place)
 
         if len(result)==0:
-            result = f"no slots available in {code['place'][1]}"
+            result = f"not available in {code['place'][1]}"
 
     else:
-        result = 'error in res'
+        result = 'error_in_res'
 
 
-    
-    message = client.messages.create(from_='whatsapp:+14155238886',  
-                                        body=f"Your cowin code is \n{result}",      
+    client.messages.create(from_='whatsapp:+14155238886',  
+                                        body=f"Your cowin code is {result}",      
                                         to='whatsapp:+917000263689')
 
     
     
+   
 schedule.every(6).hours.do(function, code=pkl_code)
 schedule.every(6).hours.do(function, code=chd_code)
 while True:
