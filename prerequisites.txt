@@ -3,10 +3,11 @@ Things you'll need to get this up & running:
 1) Twilio Account
    Sign up for twilio, get yourself and your whatsapp number verified. Activate your Whatsapp sandbox by the process shown
    on the website. Store your API credentials safely.
+   NOTE : You'll have to send a message to the twilio bot every 3 days to keep it running (unless you have a Whatsapp 
+	  Business account)
 
 2) Heroku account
-   Sign up for a free heroku account, create an app, name it anything you want. Also install heoku CLI. Store twilio API 
-   credentials onto your heroku app so that the python script will be able to access it from the app. You can store your API 
-   credentials by heading over to Settings > reveal config vars > add var. 
+   Sign up for a free heroku account, create an app, name it anything you want. Also install heroku CLI. Store twilio API 
+   credentials onto your heroku app so that the python script will be able to access it from the app.
 
 And then just deploy this git repository as it is onto your heroku app and you're good to go.
