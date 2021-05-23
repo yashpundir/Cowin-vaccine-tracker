@@ -9,7 +9,7 @@ pkl_code = {'place':[187,'pkl']}
 chd_code = {'place':[108,'chd']}
 headers = {'User-Agent':'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3'}
 
-with open('D:/Yash/Python Projects/Cowin vaccine tracker/proxies.txt','r') as file:
+with open('proxies.txt','r') as file:
     data = file.readlines()
 
 proxies = {'https': data[0][9:-2].split(','),
